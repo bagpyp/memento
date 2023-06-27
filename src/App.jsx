@@ -4,6 +4,9 @@ import Card from "./components/Card";
 
 function App() {
 
+  // useState calls functions it is passed, and
+  // sets the state var to the function's return
+  // value I guess
   const [cards, setCards] = useState(shuffle)
 
   return (
