@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import shuffle from './utilities/shuffle'
 import Card from "./components/Card";
+import Header from "./components/Header";
 
 function App() {
 
@@ -23,6 +24,12 @@ function App() {
     setPickOne(null)
     setPickTwo(null)
     setDisabled(false)
+  }
+
+  const handleNewGame = () => {
+    setWins(0)
+    handleTurn()
+    setCards(shuffle)
   }
 
   useEffect(() => {
@@ -67,6 +74,9 @@ function App() {
 
   return (
     <>
+
+      <Header handleNewGame={handleNewGame} wins={wins}></Header>
+
       <div className="grid">
         {cards.map((card) => {
           const { image, id, matched } = card
