@@ -7,6 +7,7 @@ export default function Card({ image, selected, onClick }) {
           alt=""
           className="card-back"
           src={'/assets/fireship.png'}
+          onClick={onClick}
         />
       </div>
     </div>
