@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import shuffle from './utilities/shuffle'
 import Card from "./components/Card";
 import Header from "./components/Header";
+import useAppBadge from "./hooks/useAppBadge";
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
   const [pickTwo, setPickTwo] = useState(null) // second selection
   const [disabled, setDisabled] = useState(false) // delay handler
   const [wins, setWins] = useState(0) //  streak
+  const [setBadge, clearBadge] = useAppBadge() // handles app badge
 
   const handleClick = (card) => {
     if (!disabled) {
@@ -27,6 +29,7 @@ function App() {
   }
 
   const handleNewGame = () => {
+    clearBadge()
     setWins(0)
     handleTurn()
     setCards(shuffle)
@@ -67,6 +70,7 @@ function App() {
       console.log('You win!')
       setWins(wins + 1)
       handleTurn()
+      setBadge()
       setCards(shuffle)
     }
 
