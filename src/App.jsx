@@ -1,98 +1,106 @@
-import { useState, useEffect } from "react";
-import shuffle from './utilities/shuffle'
-import Card from "./components/Card";
-import Header from "./components/Header";
-import useAppBadge from "./hooks/useAppBadge";
+import { useState, useEffect } from 'react';
+import Card from './components/Card';
+import Header from './components/Header';
+import useAppBadge from './hooks/useAppBadge';
+import shuffle from './utilities/shuffle';
 
 function App() {
+  const [wins, setWins] = useState(0); // Win streak
+  const [cards, setCards] = useState(shuffle); // Cards array from assets
+  const [pickOne, setPickOne] = useState(null); // First selection
+  const [pickTwo, setPickTwo] = useState(null); // Second selection
+  const [disabled, setDisabled] = useState(false); // Delay handler
+  const [setBadge, clearBadge] = useAppBadge(); // Handles app badge
 
-  // useState calls functions it is passed, and
-  // sets the state var to the function's return
-  // value I guess
-  const [cards, setCards] = useState(shuffle)
-  const [pickOne, setPickOne] = useState(null) // first selection
-  const [pickTwo, setPickTwo] = useState(null) // second selection
-  const [disabled, setDisabled] = useState(false) // delay handler
-  const [wins, setWins] = useState(0) //  streak
-  const [setBadge, clearBadge] = useAppBadge() // handles app badge
-
+  // Handle card selection
   const handleClick = (card) => {
     if (!disabled) {
-      pickOne ? setPickTwo(card) : setPickOne(card)
+      pickOne ? setPickTwo(card) : setPickOne(card);
     }
-  }
+  };
 
   const handleTurn = () => {
-    setPickOne(null)
-    setPickTwo(null)
-    setDisabled(false)
-  }
+    setPickOne(null);
+    setPickTwo(null);
+    setDisabled(false);
+  };
 
+  // Start over
   const handleNewGame = () => {
-    clearBadge()
-    setWins(0)
-    handleTurn()
-    setCards(shuffle)
-  }
+    setWins(0);
+    clearBadge();
+    handleTurn();
+    setCards(shuffle);
+  };
 
+  // Used for selection and match handling
   useEffect(() => {
-    let pickTimer
+    let pickTimer;
 
+    // Two cards have been clicked
     if (pickOne && pickTwo) {
+      // Check if the cards the same
       if (pickOne.image === pickTwo.image) {
         setCards((prevCards) => {
           return prevCards.map((card) => {
             if (card.image === pickOne.image) {
-              return { ...card, matched: true }
+              // Update card property to reflect match
+              return { ...card, matched: true };
             } else {
-              return card
+              // No match
+              return card;
             }
-          })
-        })
-        handleTurn()
+          });
+        });
+        handleTurn();
       } else {
-        setDisabled(true)
+        // Prevent new selections until after delay
+        setDisabled(true);
+        // Add delay between selections
         pickTimer = setTimeout(() => {
-          handleTurn()
-        }, 1000)
+          handleTurn();
+        }, 1000);
       }
     }
 
     return () => {
-      clearTimeout(pickTimer)
-    }
-  }, [cards, pickOne, pickTwo])
+      clearTimeout(pickTimer);
+    };
+  }, [cards, pickOne, pickTwo, setBadge, wins]);
 
+
+  // If player has found all matches, handle accordingly
   useEffect(() => {
+    // Check for any remaining card matches
+    const checkWin = cards.filter((card) => !card.matched);
 
-    const checkWin = cards.filter((card) => !cards.matched)
+    // All matches made, handle win/badge counters
     if (cards.length && checkWin.length < 1) {
-      console.log('You win!')
-      setWins(wins + 1)
-      handleTurn()
-      setBadge()
-      setCards(shuffle)
+      console.log('You win!');
+      setWins(wins + 1);
+      setBadge();
+      handleTurn();
+      setCards(shuffle);
     }
-
-  }, [cards, wins])
+  }, [cards, setBadge, wins]);
 
   return (
     <>
-
-      <Header handleNewGame={handleNewGame} wins={wins}></Header>
-
+      <Header handleNewGame={handleNewGame} wins={wins} />
       <div className="grid">
         {cards.map((card) => {
-          const { image, id, matched } = card
+          // Destructured card properties
+          const { image, matched } = card;
 
           return (
             <Card
-              key={id}
+              key={image.id}
+              card={card}
               image={image}
-              selected={card === pickOne || card === pickTwo || matched}
               onClick={() => handleClick(card)}
+              selected={card === pickOne || card === pickTwo || matched}
             />
-          )
+          );
         })}
       </div>
     </>
